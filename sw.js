@@ -2,7 +2,7 @@ const CACHE_NAME = "rondleiding-v1";
 
 const FILES = [
   "./",
-  "./index.html.html",
+  "./index.html",
   "./manifest.json",
   "./afbeeldingen/achtergrond.jpg",
   "./afbeeldingen/logo.png",
