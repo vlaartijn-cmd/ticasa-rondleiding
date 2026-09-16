@@ -1,0 +1,1090 @@
+```html
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Interactieve Tour</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+
+            font-family: Arial, sans-serif;
+
+            background: #111;
+
+            color: white;
+
+            overflow: hidden;
+        }
+
+
+        /* =========================
+           SCHERMEN
+        ========================= */
+
+        .screen {
+            display: none;
+
+            width: 100vw;
+            height: 100vh;
+        }
+
+
+        .screen.active {
+            display: flex;
+        }
+
+
+        /* =========================
+           STARTSCHERM
+        ========================= */
+
+        #startScreen {
+
+            position: relative;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+            align-items: center;
+
+            text-align: center;
+
+            padding: 30px;
+
+            background-size: cover;
+
+            background-position: center;
+
+            background-repeat: no-repeat;
+        }
+
+
+        #startScreen::before {
+
+            content: "";
+
+            position: absolute;
+
+            inset: 0;
+
+            background: rgba(0, 0, 0, 0.35);
+
+            z-index: 0;
+        }
+
+
+        .start-content {
+
+            position: relative;
+
+            z-index: 1;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+        }
+
+
+        .logo {
+
+            max-width: 280px;
+
+            max-height: 180px;
+
+            object-fit: contain;
+
+            margin-bottom: 35px;
+        }
+
+
+        .welcome-text {
+
+            font-size: clamp(18px, 2.5vw, 30px);
+
+            letter-spacing: 3px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 15px;
+        }
+
+
+        .main-title {
+
+            font-size: clamp(40px, 7vw, 90px);
+
+            font-weight: 400;
+
+            margin: 0 0 45px;
+        }
+
+
+        .start-button {
+
+            background: #e6d2ad;
+
+            color: #222;
+
+            border: none;
+
+            border-radius: 14px;
+
+            padding: 23px 65px;
+
+            font-size: 27px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.25s;
+        }
+
+
+        .start-button:hover {
+
+            transform: scale(1.05);
+
+            background: #f0dfc1;
+        }
+
+
+
+        /* =========================
+           RONDLÉIDERSCHERM
+        ========================= */
+
+        #guideScreen {
+
+            position: relative;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+            align-items: center;
+
+            text-align: center;
+
+            padding: 30px;
+
+            background-image:
+                url("afbeeldingen/achtergrond.jpg");
+
+            background-size: cover;
+
+            background-position: center;
+        }
+
+
+        #guideScreen::before {
+
+            content: "";
+
+            position: absolute;
+
+            inset: 0;
+
+            background: rgba(10, 10, 10, 0.88);
+
+            z-index: 0;
+        }
+
+
+        .guide-content {
+
+            position: relative;
+
+            z-index: 1;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            width: 100%;
+        }
+
+
+        .guide-title {
+
+            font-size: clamp(30px, 4vw, 60px);
+
+            font-weight: 400;
+
+            margin: 0 0 15px;
+        }
+
+
+        .guide-subtitle {
+
+            font-size: clamp(18px, 2vw, 26px);
+
+            color: #ccc;
+
+            margin-bottom: 45px;
+        }
+
+
+
+        /* =========================
+           KAARTEN
+        ========================= */
+
+        .guides {
+
+            display: flex;
+
+            gap: 25px;
+
+            justify-content: center;
+
+            align-items: stretch;
+
+            flex-wrap: wrap;
+
+            max-width: 1100px;
+        }
+
+
+        .guide-card {
+
+            width: 230px;
+
+            min-height: 290px;
+
+            padding: 25px 20px;
+
+            background:
+                rgba(255, 255, 255, 0.08);
+
+            border:
+                1px solid rgba(255, 255, 255, 0.25);
+
+            border-radius: 18px;
+
+            cursor: pointer;
+
+            transition: 0.25s;
+        }
+
+
+        .guide-card:hover {
+
+            transform: translateY(-8px);
+
+            background:
+                rgba(255, 255, 255, 0.16);
+
+            border-color: white;
+        }
+
+
+
+        /* ==================================================
+           RONDE FOTO CONTAINER
+        ================================================== */
+
+        .guide-image-container {
+
+            position: relative;
+
+            width: 145px;
+
+            height: 145px;
+
+            margin: 0 auto 15px;
+
+            border-radius: 50%;
+
+            overflow: hidden;
+
+            background: #111;
+        }
+
+
+
+        /* ==================================================
+           VIDEO
+        ================================================== */
+
+        .guide-background {
+
+            position: absolute;
+
+            top: -20%;
+
+            left: -20%;
+
+            width: 140%;
+
+            height: 140%;
+
+            object-fit: cover;
+
+            z-index: 1;
+
+            pointer-events: none;
+
+            animation:
+                sparkleMove
+                12s
+                ease-in-out
+                infinite
+                alternate;
+        }
+
+
+
+        /* ==================================================
+           PNG PERSONAGE
+        ================================================== */
+
+        .guide-photo {
+
+            position: absolute;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: contain;
+
+            z-index: 10;
+
+            pointer-events: none;
+        }
+
+
+
+        /* ==================================================
+           VIDEO BEWEGING
+        ================================================== */
+
+        @keyframes sparkleMove {
+
+            0% {
+
+                transform:
+                    translate(-8px, -5px)
+                    scale(1);
+            }
+
+
+            25% {
+
+                transform:
+                    translate(5px, -2px)
+                    scale(1.03);
+            }
+
+
+            50% {
+
+                transform:
+                    translate(8px, 5px)
+                    scale(1.05);
+            }
+
+
+            75% {
+
+                transform:
+                    translate(-5px, 3px)
+                    scale(1.03);
+            }
+
+
+            100% {
+
+                transform:
+                    translate(-8px, -5px)
+                    scale(1);
+            }
+
+        }
+
+
+
+        /* =========================
+           TEKST
+        ========================= */
+
+        .guide-card h2 {
+
+            font-size: 25px;
+
+            margin: 5px 0 10px;
+
+            font-weight: 400;
+        }
+
+
+        .guide-card p {
+
+            color: #bbb;
+
+            font-size: 16px;
+
+            margin: 0;
+        }
+
+
+
+        /* =========================
+           TERUG
+        ========================= */
+
+        .back-button {
+
+            position: relative;
+
+            z-index: 5;
+
+            margin-top: 40px;
+
+            padding: 13px 25px;
+
+            font-size: 16px;
+
+            color: white;
+
+            background: transparent;
+
+            border: 1px solid #777;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+        }
+
+
+        .back-button:hover {
+
+            background:
+                rgba(255, 255, 255, 0.1);
+        }
+
+
+
+        /* =========================
+           WELKOM
+        ========================= */
+
+        #welcomeScreen {
+
+            background: #171717;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+            align-items: center;
+
+            text-align: center;
+
+            padding: 30px;
+        }
+
+
+        #welcomeScreen h1 {
+
+            font-size:
+                clamp(35px, 5vw, 70px);
+
+            font-weight: 400;
+
+            margin-bottom: 20px;
+        }
+
+
+        #welcomeScreen p {
+
+            font-size: 24px;
+
+            color: #ccc;
+
+            margin-bottom: 40px;
+        }
+
+
+        .continue-button {
+
+            padding: 20px 45px;
+
+            font-size: 22px;
+
+            color: #222;
+
+            background: #e6d2ad;
+
+            border: none;
+
+            border-radius: 12px;
+
+            cursor: pointer;
+        }
+
+
+        .continue-button:hover {
+
+            background: #f0dfc1;
+        }
+
+
+
+        /* =========================
+           IPAD
+        ========================= */
+
+        @media (max-width: 700px) {
+
+            .logo {
+
+                max-width: 200px;
+
+                max-height: 130px;
+            }
+
+
+            .start-button {
+
+                font-size: 22px;
+
+                padding: 20px 40px;
+            }
+
+
+            .guides {
+
+                gap: 12px;
+            }
+
+
+            .guide-card {
+
+                width: 150px;
+
+                min-height: 220px;
+
+                padding: 15px 10px;
+            }
+
+
+            .guide-image-container {
+
+                width: 90px;
+
+                height: 90px;
+            }
+
+
+            .guide-card h2 {
+
+                font-size: 20px;
+            }
+
+
+            .guide-card p {
+
+                font-size: 14px;
+            }
+
+
+            .guide-subtitle {
+
+                margin-bottom: 25px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+
+<body>
+
+
+    <!-- ==================================================
+         INSTELLINGEN
+    ================================================== -->
+
+    <script>
+
+        const instellingen = {
+
+            hotelNaam:
+                "TICASA",
+
+            welkomTekst:
+                "Welkom bij",
+
+            startKnop:
+                "START DE TOUR",
+
+
+            achtergrond:
+                "afbeeldingen/achtergrond.jpg",
+
+            logo:
+                "afbeeldingen/logo.png",
+
+
+            rondleiderTitel:
+                "Wie geeft jullie de rondleiding?",
+
+            rondleiderSubtitel:
+                "Kies jullie persoonlijke rondleider"
+
+        };
+
+
+
+        /* ==================================================
+           RONDLÉIDERS
+        ================================================== */
+
+        const rondleiders = [
+
+            {
+
+                naam:
+                    "Victor",
+
+                functie:
+                    "Het vriendelijke spook",
+
+                foto:
+                    "afbeeldingen/victor.png",
+
+                achtergrond:
+                    "afbeeldingen/achtergrond.mp4"
+
+            },
+
+
+            {
+
+                naam:
+                    "Morgana",
+
+                functie:
+                    "De mysterieuze heks",
+
+                foto:
+                    "afbeeldingen/morgana.png",
+
+                achtergrond:
+                    "afbeeldingen/achtergrond.mp4"
+
+            },
+
+
+            {
+
+                naam:
+                    "T.O.M.",
+
+                functie:
+                    "De digitale robot",
+
+                foto:
+                    "afbeeldingen/tom.png",
+
+                achtergrond:
+                    "afbeeldingen/achtergrond.mp4"
+
+            }
+
+        ];
+
+
+
+        /* ==================================================
+           PAGINA LADEN
+        ================================================== */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function() {
+
+
+                document
+                    .getElementById("startScreen")
+                    .style.backgroundImage =
+                    `url("${instellingen.achtergrond}")`;
+
+
+                document
+                    .getElementById("startLogo")
+                    .src =
+                    instellingen.logo;
+
+
+                document
+                    .getElementById("welcomeText")
+                    .textContent =
+                    instellingen.welkomTekst;
+
+
+                document
+                    .getElementById("mainTitle")
+                    .textContent =
+                    instellingen.hotelNaam;
+
+
+                document
+                    .getElementById("startButton")
+                    .textContent =
+                    instellingen.startKnop;
+
+
+                document
+                    .getElementById("guideTitle")
+                    .textContent =
+                    instellingen.rondleiderTitel;
+
+
+                document
+                    .getElementById("guideSubtitle")
+                    .textContent =
+                    instellingen.rondleiderSubtitel;
+
+
+
+                const guideContainer =
+                    document.getElementById("guides");
+
+
+                rondleiders.forEach(
+                    function(rondleider) {
+
+
+                        const card =
+                            document.createElement("div");
+
+
+                        card.className =
+                            "guide-card";
+
+
+                        card.innerHTML = `
+
+                            <div
+                                class="guide-image-container"
+                            >
+
+                                <video
+                                    class="guide-background"
+
+                                    autoplay
+
+                                    muted
+
+                                    loop
+
+                                    playsinline
+
+                                    preload="auto"
+                                >
+
+                                    <source
+                                        src="${rondleider.achtergrond}"
+                                        type="video/mp4"
+                                    >
+
+                                </video>
+
+
+                                <img
+                                    class="guide-photo"
+
+                                    src="${rondleider.foto}"
+
+                                    alt="${rondleider.naam}"
+                                >
+
+                            </div>
+
+
+                            <h2>
+                                ${rondleider.naam}
+                            </h2>
+
+
+                            <p>
+                                ${rondleider.functie}
+                            </p>
+
+                        `;
+
+
+                        card.onclick =
+                            function() {
+
+                                selectGuide(
+                                    rondleider
+                                );
+
+                            };
+
+
+                        guideContainer
+                            .appendChild(card);
+
+                    }
+                );
+
+            }
+        );
+
+
+
+        /* ==================================================
+           SCHERM FUNCTIES
+        ================================================== */
+
+        function hideAllScreens() {
+
+            document
+                .querySelectorAll(".screen")
+                .forEach(
+                    function(screen) {
+
+                        screen
+                            .classList
+                            .remove("active");
+
+                    }
+                );
+
+        }
+
+
+        function showGuides() {
+
+            hideAllScreens();
+
+
+            document
+                .getElementById("guideScreen")
+                .classList
+                .add("active");
+
+        }
+
+
+        function showStart() {
+
+            hideAllScreens();
+
+
+            document
+                .getElementById("startScreen")
+                .classList
+                .add("active");
+
+        }
+
+
+        function selectGuide(
+            rondleider
+        ) {
+
+            hideAllScreens();
+
+
+            document
+                .getElementById(
+                    "selectedGuideText"
+                )
+                .textContent =
+
+                rondleider.naam +
+                " neemt jullie mee tijdens de rondleiding.";
+
+
+            document
+                .getElementById(
+                    "welcomeScreen"
+                )
+                .classList
+                .add("active");
+
+        }
+
+    </script>
+
+
+
+    <!-- ==================================================
+         STARTSCHERM
+    ================================================== -->
+
+    <section
+        id="startScreen"
+        class="screen active"
+    >
+
+        <div
+            class="start-content"
+        >
+
+            <img
+                id="startLogo"
+
+                class="logo"
+
+                src=""
+
+                alt="Logo"
+            >
+
+
+            <div
+                id="welcomeText"
+
+                class="welcome-text"
+            >
+            </div>
+
+
+            <h1
+                id="mainTitle"
+
+                class="main-title"
+            >
+            </h1>
+
+
+            <button
+                id="startButton"
+
+                class="start-button"
+
+                onclick="showGuides()"
+            >
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==================================================
+         RONDLÉIDER KIEZEN
+    ================================================== -->
+
+    <section
+        id="guideScreen"
+
+        class="screen"
+    >
+
+        <div
+            class="guide-content"
+        >
+
+            <h1
+                id="guideTitle"
+
+                class="guide-title"
+            >
+            </h1>
+
+
+            <div
+                id="guideSubtitle"
+
+                class="guide-subtitle"
+            >
+            </div>
+
+
+            <div
+                id="guides"
+
+                class="guides"
+            >
+            </div>
+
+
+            <button
+                class="back-button"
+
+                onclick="showStart()"
+            >
+
+                Terug naar start
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==================================================
+         WELKOMSSCHERM
+    ================================================== -->
+
+    <section
+        id="welcomeScreen"
+
+        class="screen"
+    >
+
+        <h1>
+            Welkom bij de tour
+        </h1>
+
+
+        <p
+            id="selectedGuideText"
+        >
+        </p>
+
+
+        <button
+            class="continue-button"
+
+            onclick="showGuides()"
+        >
+
+            Andere rondleider kiezen
+
+        </button>
+
+    </section>
+
+
+</body>
+
+</html>
+```
